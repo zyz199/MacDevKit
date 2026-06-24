@@ -49,9 +49,9 @@ enum Commands {
 
 fn main() {
     print_welcome();
-    
+
     let cli = Cli::parse();
-    
+
     match &cli.command {
         Some(Commands::Setup) => run_full_setup(),
         Some(Commands::Xcode) => install_xcode_tools(),
@@ -72,21 +72,31 @@ fn main() {
 }
 
 fn print_welcome() {
-    println!("{}", r#"
+    println!(
+        "{}",
+        r#"
     __  ___          ____             __ __ _ __ 
    /  |/  /___ _____/ __ \___ _   __/ //_/(_) /_
   / /|_/ / __ `/ __/ / / / _ \ | / / ,<  / / __/
  / /  / / /_/ / /_/ /_/ /  __/ |/ / /| |/ / /_  
 /_/  /_/\__,_/\__/_____/\___/|___/_/ |_/_/\__/  
                                                  
-"#.bright_blue());
-    
-    println!("{}", "Welcome to MacDevKit - Your Ultimate macOS Development Environment Setup Tool".yellow());
+"#
+        .bright_blue()
+    );
+
+    println!(
+        "{}",
+        "Welcome to MacDevKit - Your Ultimate macOS Development Environment Setup Tool".yellow()
+    );
     println!();
     println!("{}", "This CLI tool will help you:".cyan());
     println!("  {}  Install essential developer tools", "✓".green());
     println!("  {}  Configure your development environment", "✓".green());
-    println!("  {}  Set up programming languages and frameworks", "✓".green());
+    println!(
+        "  {}  Set up programming languages and frameworks",
+        "✓".green()
+    );
     println!("  {}  Install useful applications", "✓".green());
     println!("  {}  Optimize your macOS settings", "✓".green());
     println!();
@@ -110,14 +120,14 @@ fn run_interactive_menu() {
         "Create development workspace",
         "Exit",
     ];
-    
+
     let selection = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Select an option")
         .default(0)
         .items(&options)
         .interact()
         .unwrap();
-    
+
     match selection {
         0 => run_full_setup(),
         1 => install_xcode_tools(),
@@ -140,65 +150,68 @@ fn run_interactive_menu() {
 
 fn run_full_setup() {
     println!("{}", "\n==== Running Full Setup ====\n".blue());
-    
+
     // Run all steps sequentially with confirmation for each
     if confirm_step("Install Xcode Command Line Tools") {
         install_xcode_tools();
     }
-    
+
     if confirm_step("Install Homebrew") {
         install_homebrew();
     }
-    
+
     if confirm_step("Install and Configure Git") {
         install_git();
     }
-    
+
     if confirm_step("Generate SSH Key") {
         generate_ssh_key();
     }
-    
+
     if confirm_step("Install Visual Studio Code") {
         install_vscode();
     }
-    
+
     if confirm_step("Install Node.js via NVM") {
         install_node();
     }
-    
+
     if confirm_step("Install iTerm2") {
         install_iterm();
     }
-    
+
     if confirm_step("Install Oh My Zsh") {
         install_oh_my_zsh();
     }
-    
+
     if confirm_step("Install Docker") {
         install_docker();
     }
-    
+
     if confirm_step("Install Additional Developer Tools") {
         install_dev_tools();
     }
-    
+
     if confirm_step("Install Useful Applications") {
         install_apps();
     }
-    
+
     if confirm_step("Configure macOS Settings") {
         configure_macos();
     }
-    
+
     if confirm_step("Create Development Workspace") {
         create_workspace();
     }
-    
+
     println!("{}", "\n==== Setup Complete! ====\n".blue());
     println!("{}", "Your Mac has been set up for development.".green());
-    println!("{}", "Some changes may require a restart to take effect.".yellow());
+    println!(
+        "{}",
+        "Some changes may require a restart to take effect.".yellow()
+    );
     println!("{}", "Enjoy your new development environment!".green());
-    
+
     if confirm_restart() {
         restart_computer();
     }
@@ -230,23 +243,27 @@ fn install_xcode_tools() {
     match script_handler.run_section("xcode") {
         Ok(success) => {
             if success {
-                println!("{}", "Xcode Command Line Tools installation completed".green());
+                println!(
+                    "{}",
+                    "Xcode Command Line Tools installation completed".green()
+                );
             } else {
                 println!("{}", "Xcode Command Line Tools installation failed".red());
             }
-        },
+        }
         Err(e) => {
             println!("{}", format!("Error: {}", e).red());
-            
+
             // Fallback to direct implementation
             if command_exists("xcode-select") {
                 println!("{}", "✓ Xcode Command Line Tools already installed".green());
             } else {
                 println!("{}", "Installing Xcode Command Line Tools...".cyan());
-                let _ = Command::new("xcode-select")
-                    .args(["--install"])
-                    .status();
-                println!("{}", "Xcode Command Line Tools installation triggered".green());
+                let _ = Command::new("xcode-select").args(["--install"]).status();
+                println!(
+                    "{}",
+                    "Xcode Command Line Tools installation triggered".green()
+                );
                 println!("Please wait for the installation to complete.");
             }
         }
@@ -262,17 +279,15 @@ fn install_homebrew() {
             } else {
                 println!("{}", "Homebrew installation failed".red());
             }
-        },
+        }
         Err(e) => {
             println!("{}", format!("Error: {}", e).red());
-            
+
             // Fallback to direct implementation
             if command_exists("brew") {
                 println!("{}", "✓ Homebrew already installed".green());
-                
-                let _ = Command::new("brew")
-                    .arg("update")
-                    .status();
+
+                let _ = Command::new("brew").arg("update").status();
                 println!("{}", "Homebrew updated".green());
             } else {
                 println!("{}", "Installing Homebrew...".cyan());
@@ -290,60 +305,58 @@ fn install_git() {
     let script_handler = ScriptHandler::new();
     if let Err(e) = script_handler.run_section("git") {
         println!("{}", format!("Error: {}", e).red());
-        
+
         // Fallback implementation
         if command_exists("git") {
             println!("{}", "✓ Git already installed".green());
         } else {
             println!("{}", "Installing Git...".cyan());
-            let _ = Command::new("brew")
-                .args(["install", "git"])
-                .status();
+            let _ = Command::new("brew").args(["install", "git"]).status();
             println!("{}", "Git installed".green());
         }
-        
+
         // Configure Git if not already
         let username_output = Command::new("git")
             .args(["config", "--global", "user.name"])
             .output();
-        
+
         // 检查是否有输出，而不是使用 unwrap_or_else 直接创建 Output
-        let has_username = username_output.is_ok() && 
-            !username_output.as_ref().unwrap().stdout.is_empty();
-        
+        let has_username =
+            username_output.is_ok() && !username_output.as_ref().unwrap().stdout.is_empty();
+
         if !has_username {
             // Let user enter git configuration
             let git_username = dialoguer::Input::<String>::new()
                 .with_prompt("Enter your Git username")
                 .interact()
                 .unwrap_or_else(|_| String::from(""));
-                
+
             let _ = Command::new("git")
                 .args(["config", "--global", "user.name", &git_username])
                 .status();
-                
+
             let git_email = dialoguer::Input::<String>::new()
                 .with_prompt("Enter your Git email")
                 .interact()
                 .unwrap_or_else(|_| String::from(""));
-                
+
             let _ = Command::new("git")
                 .args(["config", "--global", "user.email", &git_email])
                 .status();
-                
+
             // Set some sensible Git defaults
             let _ = Command::new("git")
                 .args(["config", "--global", "init.defaultBranch", "main"])
                 .status();
-                
+
             let _ = Command::new("git")
                 .args(["config", "--global", "core.editor", "code --wait"])
                 .status();
-                
+
             let _ = Command::new("git")
                 .args(["config", "--global", "pull.rebase", "false"])
                 .status();
-                
+
             println!("{}", "Git configured".green());
         } else {
             println!("{}", "✓ Git already configured".green());
@@ -428,7 +441,7 @@ fn create_workspace() {
     let script_handler = ScriptHandler::new();
     if let Err(e) = script_handler.run_section("workspace") {
         println!("{}", format!("Error: {}", e).red());
-        
+
         // Fallback implementation
         let home_dir = std::env::var("HOME").unwrap_or_else(|_| String::from("~"));
         let _ = Command::new("mkdir")
@@ -443,4 +456,4 @@ fn restart_computer() {
     let _ = Command::new("sudo")
         .args(["shutdown", "-r", "now"])
         .status();
-} 
+}

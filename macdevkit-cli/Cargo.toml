@@ -1,7 +1,7 @@
 [package]
 name = "macdevkit-cli"
 version = "0.1.5"
-edition = "2025"
+edition = "2021"
 authors = ["zyz199"]
 description = "A Rust CLI wrapper for MacDevKit setup script"
 license = "MIT"
